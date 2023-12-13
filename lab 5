@@ -1,0 +1,121 @@
+#include <iostream>
+
+using namespace std;
+
+double function_var4(double x)
+{
+  double f = (1 + pow(x, 2)) / (1 + pow(x, 3));
+  return f;
+}
+
+double function_var31(double x, double y)
+{
+  double f = pow(x,2)+2*y;
+
+  return f;
+}
+
+double hx(double a, double b, double N)
+{
+  double x = (b - a) / (2 * N);
+  return x;
+}
+double hy(double c, double d, double M)
+{
+  double x = (d - c) / (2 * M);
+  return x;
+}
+double xi(double a, int i, double hx)
+{
+  return a + i * hx;
+}
+double yj(double b, int j, double hy)
+{
+  return b + j * hy;
+}
+
+double firstmethod(double a, double b, double h) //trapeoid method
+{
+  double integral = 0;
+  int n;
+
+  n = (b - a) / h;
+
+  integral = (h / 2) * (function_var4(a) + function_var4(b));
+  for (int i = 1; i < n - 1; i++)
+  {
+    integral = integral + (2 * h / 2) * function_var4(a + (h * i));
+  }
+
+  cout << "trapeoid" << endl << "integral = " << integral << endl << endl;
+  return 0;
+}
+
+double secondmethod(double a, double b, double h) //simpson method
+{
+  double integral = 0;
+  int n, m;
+
+  n = (b - a) / h;
+  m = n / 2;
+
+  integral = (h / 3) * (function_var4(a) + function_var4(b));
+  for (int i = 1; i < m; i++)
+  {
+    integral = integral + (4 * h / 3 * function_var4(a + (h * (2 * i - 1))));
+  }
+  for (int i = 1; i < m - 1; i++)
+  {
+    integral = integral + (2 * h / 3 * function_var4(a + (h * 2 * i)));
+  }
+  cout << "simpson" << endl << "integral = " << integral << endl << endl;
+  return 0;
+}
+
+
+double thirdmethod(double a, double b, double c, double d, double h) //cubature simpson method
+{
+
+  double M = 1000; double N = 1000;
+
+  /*integral = function2(a, c) + function2(a, d) + function2(b, c) + function2(b, d);*/
+
+  double I = (hx(a, b, N) * hy(c, d, M)) / 9, sum = 0, res = 0;
+  for (int i = 1; i < N; i++)
+  {
+    for (int j = 1; j < M; j++)
+    {
+      sum += function_var31(xi(a, 2 * i, hx(a, b, N)), yj(c, 2 * j, hy(c, d, M)))
+        + 4 * function_var31(xi(a, (2 * i) + 1, hx(a, b, N)), yj(c, 2 * j, hy(c, d, M)))
+        + function_var31(xi(a, (2 * i) + 2, hx(a, b, N)), yj(c, 2 * j, hy(c, d, M)))
+        + 4 * function_var31(xi(a, (2 * i), hx(a, b, N)), yj(c, (2 * j) + 1, hy(c, d, M)))
+        + 16 * function_var31(xi(a, (2 * i) + 1, hx(a, b, N)), yj(c, (2 * j) + 1, hy(c, d, M)))
+        + 4 * function_var31(xi(a, (2 * i) + 2, hx(a, b, N)), yj(c, (2 * j) + 1, hy(c, d, M)))
+        + function_var31(xi(a, 2 * i, hx(a, b, N)), yj(c, (2 * j) + 2, hy(c, d, M)))
+        + 4 * function_var31(xi(a, (2 * i) + 1, hx(a, b, N)), yj(c, (2 * j) + 2, hy(c, d, M)))
+        + function_var31(xi(a, (2 * i) + 2, hx(a, b, N)), yj(c, (2 * j) + 2, hy(c, d, M)));
+
+    }
+  }
+  cout << "theory integral 2 = " << 4.6666 << endl << endl;
+  cout << "cubauture simpson" << endl << "integral = " << I*sum << endl;
+
+  return 0;
+}
+
+int main()
+{
+  int n;
+  double Xmin = 3, Xmax = 4.254, h = 0.001;
+  double x1 = 0, x2 = 2, y1 = 0, y2 = 1;
+
+  cout << "theory integral 1 = " << 0.36869 << endl << endl;
+
+  firstmethod(Xmin, Xmax, h);
+
+  secondmethod(Xmin, Xmax, h);
+
+  thirdmethod(x1, x2, y1, y2, h);
+
+  return 0;
+}
